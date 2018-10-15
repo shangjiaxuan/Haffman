@@ -4,24 +4,22 @@
 extern int buffer_offset;
 
 struct Byte {
-	char data{ 0 };
+	char data[8]{ 0,0,0,0,0,0,0,0 };
 	bool operator[](const int i) const {
-		return data & (0x80 >> i);
-	}
-	operator unsigned char() const {
-		return data;
+		return data[i >> 3] & (0x80 >> (i & 0x07));
 	}
 	void set_true(const int index) {
-		data |= (0x80 >> index);
+		data[index >> 3] |= (0x80 >> (index & 0x07));
 	}
 	void set_false(const int index) {
-		data &= (0xFF ^ (0x80 >>index));
+		data[index >> 3] &= (0xFF ^ (0x80 >> (index & 0x07)));
 	}
 	void reset() {
-		data = 0;
+		for(int i=0; i<8; i++)
+		data[i] = 0;
 	}
 	friend std::ostream&operator<<(std::ostream&ost,const Byte& byte) {
-		ost << byte.data;
+		ost.write(byte.data, 8);
 		return  ost;
 	}
 };

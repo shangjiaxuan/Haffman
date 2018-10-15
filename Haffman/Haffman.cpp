@@ -61,14 +61,13 @@ namespace haffman {
 	}
 
 	int Haffman::encode(std::istream& input, std::ostream& output) const {
-		char c;
-		input.get(c);
+		Byte temp;
+		input.read(temp.data, 8);
 		buffer_offset = 0;
 		buffer.reset();
 		while(input.good()) {
-			const unsigned char temp = c;
-			encode_char(temp, output);
-			input.get(c);
+			encode_buffer(temp, output);
+			input.read(temp.data, 8);
 		}
 		//write the last few bits from buffer
 		output << buffer;
@@ -77,8 +76,11 @@ namespace haffman {
 		return rtn;
 	}
 
-	//de
-	void Haffman::decode_byte(std::ostream& output, int& current, int end_offset) const {
+	//use all the info in the buffer, decode whatever there is.
+	//using a separate function here instead of using "break" decrease runtime by 90%
+	//(i.e. at the improvement time, from 360 seconds to 36 seconds (now it's just a few seconds,
+	//and decreasing steadily))
+	void Haffman::decode_buffer(std::ostream& output, int& current, int end_offset) const {
 		//loop for one encoded char
 		while (buffer_offset <= end_offset) {
 			if (buffer[buffer_offset]) {
@@ -102,64 +104,68 @@ namespace haffman {
 		}
 	}
 
+	//use a local variable as buffer may improve compiler optimization and decrease runtime
 	bool Haffman::decode(std::istream& input, std::ostream& output, int last_offset, size_t end_pos) const {
 		buffer_offset = 0;
 		buffer.reset();
 		int current = root;
-		input.get(buffer.data);
+		input.read(buffer.data,8);
 		//loop for one decoded char or encoded char
 		//(one loop when either one happens)
 		while (input.good() && input.tellg() < end_pos) {
-			decode_byte(output, current, 7);
+			decode_buffer(output, current, 63);
 			//re-get the buffer when full.
 			//sets eof bit if gotten the eof bit.
-			if(buffer_offset == 8) {
-				input.get(buffer.data);
+			if(buffer_offset == 64) {
+				input.read(buffer.data,8);
 				buffer_offset = 0;
 			}
 			input.peek();
 		}
 		//decode the last char to the last bit set by the offset
-		decode_byte(output, current, last_offset);
-		cout << "Decode does not end with given offset with last char!" << endl;
-		return false;
+		decode_buffer(output, current, last_offset);
+		return true;
 	}
 
-	void Haffman::encode_char(unsigned char ch, std::ostream& output) const {
-		short current = ch;
-		short parent = tree[ch].parent;
-		//encode a char into a series of bits.
-		bool stack[256]{};
-		int filled = 0;
-		while(parent >= 0 && filled < 256) {
-			if(tree[parent].lchild == current) {
-				stack[filled] = false;
-				filled++;
-				current = parent;
-			} else if(tree[parent].rchild == current) {
-				stack[filled] = true;
-				filled++;
-				current = parent;
-			} else {
-				cout << "Haffman::encode_char(unsigned char, std::ostream&): parent has no record of child!" << endl;
-				return;
+	void Haffman::encode_buffer(Byte temp, std::ostream& output) const {
+		for(int i=0; i<8; i++) {
+			bool stack[256]{};
+			int filled = 0;
+			short current = unsigned char(temp.data[i]);
+			short parent = tree[unsigned char(temp.data[i])].parent;
+			//encode a char into a series of bits.
+			while (parent >= 0 && filled < 256) {
+				if (tree[parent].lchild == current) {
+					stack[filled] = false;
+					filled++;
+					current = parent;
+				}
+				else if (tree[parent].rchild == current) {
+					stack[filled] = true;
+					filled++;
+					current = parent;
+				}
+				else {
+					cout << "Haffman::encode_buffer(unsigned char, std::ostream&): parent has no record of child!" << endl;
+					return;
+				}
+				parent = tree[current].parent;
 			}
-			parent = tree[current].parent;
-		}
-		//put the encoded bits int buffer and write when full.
-		filled--;
-		while(filled >= 0) {
-			while(buffer_offset < 8 && (filled >= 0)) {
-				if(stack[filled])
-					buffer.set_true(buffer_offset);
-				else buffer.set_false(buffer_offset);
-				buffer_offset++;
-				filled--;
-			}
-			if(buffer_offset == 8) {
-				output << buffer;
-				buffer.reset();
-				buffer_offset = 0;
+		//put the encoded bits in the buffer and write when full.
+			filled--;
+			while(filled >= 0) {
+				while(buffer_offset < 64 && (filled >= 0)) {
+					if(stack[filled])
+						buffer.set_true(buffer_offset);
+					else buffer.set_false(buffer_offset);
+					buffer_offset++;
+					filled--;
+				}
+				if(buffer_offset == 64) {
+					output << buffer;
+					buffer.reset();
+					buffer_offset = 0;
+				}
 			}
 		}
 	}
@@ -204,7 +210,7 @@ namespace haffman {
 		}
 		ofs.write((char*)(&header), sizeof(HF_Header));
 		header.begin = ofs.tellp();
-		header.flags|=((encode(ifs, ofs))<<5);
+		header.flags|=((encode(ifs, ofs))<<2);
 		header.end = ofs.tellp();
 		ofs.seekp(0);
 		ofs.write((char*)&header, sizeof(HF_Header));
@@ -241,6 +247,6 @@ namespace haffman {
 			tree[i].parent = header.tree[3 * i + 2];
 		}
 		ifs.seekg(header.begin);
-		return decode(ifs, ofs, 0x07&(header.flags>>5),header.end);
+		return decode(ifs, ofs, 0x3F&(header.flags>>2),header.end);
 	}
 }
