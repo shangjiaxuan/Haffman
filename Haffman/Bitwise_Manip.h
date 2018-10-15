@@ -6,16 +6,16 @@ extern int char_offset;
 struct Byte {
 	char data{ 0 };
 	bool operator[](const int i) const {
-		return data & (0x01<<(7-i));
+		return data & (0x80 >> i);
 	}
 	operator unsigned char() const {
 		return data;
 	}
 	void set_true(const int index) {
-		data |= (0x01 << (7 - index));
+		data |= (0x80 >> index);
 	}
 	void set_false(const int index) {
-		data &= (0xFF ^ (0x01 << (7 - index)));
+		data &= (0xFF ^ (0x80 >>index));
 	}
 	void reset() {
 		data = 0;

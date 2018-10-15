@@ -115,14 +115,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="FileFormat.cpp" />
     <ClCompile Include="UI.cpp" />
     <ClCompile Include="Haffman.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bitwise_Manip.h" />
-    <ClInclude Include="FileFormat.h" />
     <ClInclude Include="UI.h" />
     <ClInclude Include="Haffman.h" />
     <ClInclude Include="Header.h" />

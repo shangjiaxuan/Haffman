@@ -304,6 +304,8 @@ __pycache__/
 [Ii]ntermediates/
 .leu
 *.png
+*.jpg
+*.hfm
 *.dll
 *.lib
 *.exe

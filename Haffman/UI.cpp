@@ -3,14 +3,17 @@
 using namespace std;
 
 bool UI::on = true;
-haffman::Haffman* UI::Instance = nullptr;
-
-void UI::Init() {
-	Instance = new haffman::Haffman;
-}
+haffman::Haffman UI::Haffman;
 
 void UI::main() {
-	
+	auto start = std::chrono::high_resolution_clock::now();
+	Haffman.encode("1.jpg", "1.jpg.hfm");
+	auto duration = chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - start);
+	cout << "Encoding file took " << duration.count() << " microseconds" << endl;
+	start = std::chrono::high_resolution_clock::now();
+	Haffman.decode("1.jpg.hfm","2.jpg");
+	duration = chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - start);
+	cout << "Decoding file took " << duration.count() << " microseconds" << endl;
 }
 
 
