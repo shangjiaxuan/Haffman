@@ -48,5 +48,6 @@ namespace haffman {
 		int encode(std::istream& input, std::ostream& output) const;
 		bool decode(std::istream& input, std::ostream& output, int last_offset, size_t end_pos) const;
 		void encode_char(unsigned char ch, std::ostream& output) const;
+		void decode_byte(std::ostream & output, int& current, int end_offset) const;
 	};
 }

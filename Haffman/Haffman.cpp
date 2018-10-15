@@ -6,7 +6,7 @@ using namespace std;
 //buffer for storing the intermediate code
 Byte buffer{};
 //offset of the current read in the byte
-int char_offset{0};
+int buffer_offset{0};
 
 namespace haffman {
 	void Haffman::init(std::ifstream& ifs) {
@@ -63,7 +63,7 @@ namespace haffman {
 	int Haffman::encode(std::istream& input, std::ostream& output) const {
 		char c;
 		input.get(c);
-		char_offset = 0;
+		buffer_offset = 0;
 		buffer.reset();
 		while(input.good()) {
 			const unsigned char temp = c;
@@ -72,66 +72,55 @@ namespace haffman {
 		}
 		//write the last few bits from buffer
 		output << buffer;
-		const int rtn = char_offset;
-		char_offset = 0;
+		const int rtn = buffer_offset;
+		buffer_offset = 0;
 		return rtn;
 	}
 
+	//de
+	void Haffman::decode_byte(std::ostream& output, int& current, int end_offset) const {
+		//loop for one encoded char
+		while (buffer_offset <= end_offset) {
+			if (buffer[buffer_offset]) {
+				buffer_offset++;
+				if (tree[current].rchild < 0) {
+					output << char(current);
+					current = tree[root].rchild;
+					return;
+				}
+				current = tree[current].rchild;
+			}
+			else {
+				buffer_offset++;
+				if (tree[current].lchild < 0) {
+					output << char(current);
+					current = tree[root].lchild;
+					return;
+				}
+				current = tree[current].lchild;
+			}
+		}
+	}
+
 	bool Haffman::decode(std::istream& input, std::ostream& output, int last_offset, size_t end_pos) const {
-		char_offset = 0;
+		buffer_offset = 0;
 		buffer.reset();
 		int current = root;
 		input.get(buffer.data);
 		//loop for one decoded char or encoded char
 		//(one loop when either one happens)
 		while (input.good() && input.tellg() < end_pos) {
-			//loop for one encoded char
-			while(input.good() && input.tellg()<end_pos && char_offset < 8) {
-				if(buffer[char_offset]) {
-					char_offset++;
-					if(tree[current].rchild < 0) {
-						output << char(current);
-						current = tree[root].rchild;
-						break;
-					}
-					current = tree[current].rchild;
-				} else {
-					char_offset++;
-					if (tree[current].lchild < 0) {
-						output << char(current);
-						current = tree[root].lchild;
-						break;
-					}
-					current = tree[current].lchild;
-				}
-			}
+			decode_byte(output, current, 7);
 			//re-get the buffer when full.
 			//sets eof bit if gotten the eof bit.
-			if(char_offset == 8) {
+			if(buffer_offset == 8) {
 				input.get(buffer.data);
-				char_offset = 0;
+				buffer_offset = 0;
 			}
 			input.peek();
 		}
 		//decode the last char to the last bit set by the offset
-		while (char_offset <= last_offset) {
-			if (buffer[char_offset]) {
-				char_offset++;
-				if (tree[current].rchild < 0) {
-					output << char(current);
-					return true;
-				}
-				current = tree[current].rchild;
-			}
-			else {
-				char_offset++;
-				if (tree[current].lchild < 0) {
-					output << char(current);
-					return true;
-				}
-				current = tree[current].lchild;
-			}
-		}
+		decode_byte(output, current, last_offset);
 		cout << "Decode does not end with given offset with last char!" << endl;
 		return false;
 	}
@@ -152,25 +141,25 @@ namespace haffman {
 				filled++;
 				current = parent;
 			} else {
-				throw runtime_error(
-					"Haffman::decode_char(unsigned char, std::ostream&): parent has no record of child!");
+				cout << "Haffman::encode_char(unsigned char, std::ostream&): parent has no record of child!" << endl;
+				return;
 			}
 			parent = tree[current].parent;
 		}
 		//put the encoded bits int buffer and write when full.
 		filled--;
 		while(filled >= 0) {
-			while(char_offset < 8 && (filled >= 0)) {
+			while(buffer_offset < 8 && (filled >= 0)) {
 				if(stack[filled])
-					buffer.set_true(char_offset);
-				else buffer.set_false(char_offset);
-				char_offset++;
+					buffer.set_true(buffer_offset);
+				else buffer.set_false(buffer_offset);
+				buffer_offset++;
 				filled--;
 			}
-			if(char_offset == 8) {
+			if(buffer_offset == 8) {
 				output << buffer;
 				buffer.reset();
-				char_offset = 0;
+				buffer_offset = 0;
 			}
 		}
 	}

@@ -1,7 +1,7 @@
 #pragma once
 
 //offset of the current read in the byte
-extern int char_offset;
+extern int buffer_offset;
 
 struct Byte {
 	char data{ 0 };
