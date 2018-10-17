@@ -7,7 +7,7 @@
 extern Byte buffer;
 
 namespace haffman {
-	struct node {
+	typedef struct {
 #pragma pack(push,2)
 		int lchild{-1};
 		int rchild{-1};
@@ -15,8 +15,7 @@ namespace haffman {
 		size_t count{0};
 		size_t weight{0};
 #pragma pack(pop)
-		void print(std::ostream& ost) const;
-	};
+	} node;
 
 #define MAX_CHAR 256
 #define NUM_NODE 511
@@ -43,7 +42,6 @@ namespace haffman {
 		unsigned short find_smallest(short range) const;
 		void init(std::ifstream& ifs);
 		void init_tree();
-		void print_tree() const;
 
 		int encode(std::istream& input, std::ostream& output) const;
 		bool decode(std::istream& input, std::ostream& output, int last_offset, size_t end_pos) const;

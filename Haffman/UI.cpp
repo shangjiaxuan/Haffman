@@ -44,8 +44,9 @@ void UI::main(int argc, char* argv[]) {
 			}
 		}
 		cout << endl;
-		Haffman.encode(arg, arg2);
-		cout << "Done encoding!\n" << endl;
+		if(Haffman.encode(arg, arg2))
+			cout << "Done encoding!\n" << endl;
+		else cout << "Encoding failed!\n" << endl;
 		return;
 	}
 	if(arg=="decode") {
@@ -69,8 +70,9 @@ void UI::main(int argc, char* argv[]) {
 			}
 		}
 		cout << endl;
-		Haffman.decode(arg, arg2);
-		cout << "Done decoding!\n" << endl;
+		if(Haffman.decode(arg, arg2))
+			cout << "Done decoding!\n" << endl;
+		else cout << "Decoding failed!\n" << endl;
 		return;
 	}
 	if(arg=="exit") {

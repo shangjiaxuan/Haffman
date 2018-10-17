@@ -10,9 +10,9 @@ int buffer_offset{0};
 
 namespace haffman {
 	void Haffman::init(std::ifstream& ifs) {
-		for(auto& i : tree) {
-			i = node();
-		}
+//		for(auto& i : tree) {
+//			i = node();
+//		}
 //		cout << "Reading file to initialize frequency list...\n";
 		char ch;
 		ifs.get(ch);
@@ -109,7 +109,7 @@ namespace haffman {
 		buffer_offset = 0;
 		buffer.reset();
 		int current = root;
-		size_t pos = input.tellg();
+		uint64_t pos = input.tellg();
 		input.read(buffer.data,8);
 		pos += 8;
 		//loop for one decoded char or encoded char
@@ -171,21 +171,6 @@ namespace haffman {
 				}
 			}
 		}
-	}
-
-	void Haffman::print_tree() const {
-		for (int i = 0; i < NUM_NODE; i++) {
-			cout << "Index:\t\t" << i << '\n';
-			tree[i].print(cout);
-		}
-	}
-
-	void node::print(std::ostream& ost) const {
-		ost << "Weight:\t\t" << weight << "\n";
-		ost << "Parent:\t\t" << parent << "\n";
-		ost << "Left child:\t" << lchild << "\n";
-		ost << "Right child:\t" << rchild << "\n";
-		ost << endl;
 	}
 
 	bool Haffman::encode(const std::string& input_file, const std::string& output_file) {
