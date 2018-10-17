@@ -11,8 +11,7 @@ public:
 	}
 	static void parse_path(std::string& path);
 	static bool on;
-	static void main();
-	static void select();
+	static void main(int argc, char* argv[]);
 	static haffman::Haffman Haffman;
 };
 

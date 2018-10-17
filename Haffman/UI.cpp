@@ -5,53 +5,78 @@ using namespace std;
 bool UI::on = true;
 haffman::Haffman UI::Haffman;
 
-void UI::main() {
-	auto start = std::chrono::high_resolution_clock::now();
-	Haffman.encode("1.jpg", "1.jpg.hfm");
-	auto duration = chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - start);
-	cout << "Encoding file took " << duration.count() << " microseconds" << endl;
-	start = std::chrono::high_resolution_clock::now();
-	Haffman.decode("1.jpg.hfm","2.jpg");
-	duration = chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - start);
-	cout << "Decoding file took " << duration.count() << " microseconds" << endl;
-}
-
-
-void UI::select() {
-	
-}
-
-void UI::parse_path(string& path) {
-	string temp;
-	istringstream iss(path);
-	char current;
-	iss.get(current);
-	while (current == ' ') {
-		iss.get(current);
-	}
-	iss.putback(current);
-	while (iss) {
-		iss.get(current);
-		switch (current) {
-		case '\"':
-			iss.get(current);
-			while (current != '\"') {
-				temp.push_back(current);
-				iss.get(current);
-			}
-			break;
-//Currently do not support redirection of meaning in the current light weight code.
-//To use more advanced features of command parsing, try look at my repo here and 
-//file a issue to integrate this into that project.
-//https://github.com/shangjiaxuan/Simple-shell
-//		case '\\':
-//
-		default:
-			temp.push_back(current);
-//			iss.get(current);
+void UI::main(int argc, char* argv[]) {
+	if(argc>3) {
+		on = false;
+		if(string("encode")==argv[1]) {
+			Haffman.encode(argv[2], argv[3]);
+			return;
 		}
+		if (string("decode") == argv[1]) {
+			Haffman.decode(argv[2], argv[3]);
+			return;
+		}
+		cout << "Syntax: hfm decode input output" << endl;
+		cout << "\t\thfm encode input output" << endl;
+		return;
 	}
-	temp.pop_back();
-	path = temp;
+	cout << '>';
+	string arg;
+	cin >> arg;
+	if(arg=="encode") {
+		cin>>arg;
+		if(arg[0]=='\"') {
+			char c;
+			cin.get(c);
+			while(c!='\"'&&c!='\n') {
+				arg.push_back(c);
+				cin.get(c);
+			}
+		}
+		string arg2;
+		cin >> arg2;
+		if (arg2[0] == '\"') {
+			char c;
+			cin.get(c);
+			while (c != '\"'&&c != '\n') {
+				arg2.push_back(c);
+				cin.get(c);
+			}
+		}
+		cout << endl;
+		Haffman.encode(arg, arg2);
+		cout << "Done encoding!\n" << endl;
+		return;
+	}
+	if(arg=="decode") {
+		cin >> arg;
+		if (arg[0] == '\"') {
+			char c;
+			cin.get(c);
+			while (c != '\"'&&c != '\n') {
+				arg.push_back(c);
+				cin.get(c);
+			}
+		}
+		string arg2;
+		cin >> arg2;
+		if (arg2[0] == '\"') {
+			char c;
+			cin.get(c);
+			while (c != '\"'&&c != '\n') {
+				arg2.push_back(c);
+				cin.get(c);
+			}
+		}
+		cout << endl;
+		Haffman.decode(arg, arg2);
+		cout << "Done decoding!\n" << endl;
+		return;
+	}
+	if(arg=="exit") {
+		on = false;
+		return;
+	}
 }
+
 

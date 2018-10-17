@@ -13,7 +13,7 @@ namespace haffman {
 		for(auto& i : tree) {
 			i = node();
 		}
-		cout << "Reading file to initialize frequency list...\n";
+//		cout << "Reading file to initialize frequency list...\n";
 		char ch;
 		ifs.get(ch);
 		while(ifs.good()) {
@@ -21,11 +21,11 @@ namespace haffman {
 			tree[temp].count++;
 			ifs.get(ch);
 		}
-		cout << endl;
-		cout << "Done initializing list, initializing Haffman tree...\n";
+//		cout << endl;
+//		cout << "Done initializing list, initializing Haffman tree...\n";
 		init_tree();
-		cout << endl;
-		cout << "Done!\n";
+//		cout << endl;
+//		cout << "Done!\n";
 	}
 
 	void Haffman::init_tree() {
@@ -104,20 +104,23 @@ namespace haffman {
 		}
 	}
 
-	//use a local variable as buffer may improve compiler optimization and decrease runtime
+	//input.tellg() takes too much time to execute, only call this once
 	bool Haffman::decode(std::istream& input, std::ostream& output, int last_offset, size_t end_pos) const {
 		buffer_offset = 0;
 		buffer.reset();
 		int current = root;
+		size_t pos = input.tellg();
 		input.read(buffer.data,8);
+		pos += 8;
 		//loop for one decoded char or encoded char
 		//(one loop when either one happens)
-		while (input.good() && input.tellg() < end_pos) {
+		while (input.good() && pos <= end_pos) {// && input.tellg() < end_pos) {
 			decode_buffer(output, current, 63);
 			//re-get the buffer when full.
 			//sets eof bit if gotten the eof bit.
 			if(buffer_offset == 64) {
 				input.read(buffer.data,8);
+				pos += 8;
 				buffer_offset = 0;
 			}
 			input.peek();

@@ -306,6 +306,7 @@ __pycache__/
 *.png
 *.jpg
 *.hfm
+*.enc
 *.dll
 *.lib
 *.exe

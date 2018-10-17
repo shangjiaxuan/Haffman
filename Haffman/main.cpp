@@ -6,13 +6,11 @@ int main(int argc, char* argv[]) {
 	UI::prompt();
 	do {
 		try {
-			UI::main();
-			break;
+			UI::main(argc, argv);
 		}
 		catch (exception& e) {
 			cerr << e.what() << '\n' << endl;
 		}
 	} while (UI::on);
-	system("pause");
 	return 0;
 }
