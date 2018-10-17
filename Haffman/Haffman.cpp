@@ -10,10 +10,10 @@ int buffer_offset{0};
 
 namespace haffman {
 	void Haffman::init(std::ifstream& ifs) {
-//		for(auto& i : tree) {
-//			i = node();
-//		}
-//		cout << "Reading file to initialize frequency list...\n";
+		for (int i = 0; i < MAX_CHAR; i++) {
+			tree[i].count = 0;
+			tree[i].weight = 0;
+		}
 		char ch;
 		ifs.get(ch);
 		while(ifs.good()) {
@@ -21,11 +21,7 @@ namespace haffman {
 			tree[temp].count++;
 			ifs.get(ch);
 		}
-//		cout << endl;
-//		cout << "Done initializing list, initializing Haffman tree...\n";
 		init_tree();
-//		cout << endl;
-//		cout << "Done!\n";
 	}
 
 	void Haffman::init_tree() {
