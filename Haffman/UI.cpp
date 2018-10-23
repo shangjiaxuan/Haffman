@@ -16,8 +16,11 @@ void UI::main(int argc, char* argv[]) {
 			Haffman.decode(argv[2], argv[3]);
 			return;
 		}
+	}
+	if(argc>1){
+		on = false;
 		cout << "Syntax: hfm decode input output" << endl;
-		cout << "\t\thfm encode input output" << endl;
+		cout << "\thfm encode input output" << endl;
 		return;
 	}
 	cout << '>';
