@@ -3,14 +3,19 @@ A simple Haffman compressor and decompressor
 
 ## General Info
 
-This is a simple Haffman compreesor and decompressor. Currently only support specifying both the input and output paths.
-Syntax: hfm decode input output
-        hfm encode input output
+This is a simple Haffman compreesor and decompressor. Currently only support specifying both the input and output paths.  
+
+Syntax:  
+`hfm decode input output`  
+`hfm encode input output`  
         
-Also support starting the program and specifying the input and output at runtime one by one.
-Syntax: encode input output
-        decode input output
-        exit
+Also support starting the program and specifying the input and output at runtime one by one.  
+Syntax:  
+`encode input output`  
+`decode input output`  
+`exit`  
+
+(`input` and `output` are file paths, respectively)
 
 Notes:
 1. Currently doen not support default file names.
