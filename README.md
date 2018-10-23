@@ -25,3 +25,8 @@ Notes:
 5. Filename format has to be surrounded with one pair and one pair only of parenthesis at the outermost if seperators are presnt(line breaks excluded).(When specifying files at runtime)
 6. May change the structure of header to make it smaller in the future. Backward compatibility not guaranteed (no version signature in encoded file by now)
 7. May add c++17 dependency if feature goes on to include encoding directories.
+
+
+Additional note:
+The letter 'a' was my teacher's insistence back in my DSA class, and much of the code here was adapted from that course.  
+(A old coursebook (may now be out of print) my teacher knew of used 'a' for the name)
