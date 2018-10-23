@@ -27,7 +27,7 @@ Notes:
 7. May add c++17 dependency if feature goes on to include encoding directories.
 
 
-Additional note:
+### Additional note:  
 The letter 'a' was my teacher's insistence back in my DSA class  
 much of the code here was adapted from my homeworks on that course.  
 (A old coursebook (may now be out of print) my teacher knew of used 'a' for the name)
